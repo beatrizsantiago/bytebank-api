@@ -1,6 +1,6 @@
-const mTransactions = require('mongoose');
+const mongoose = require('mongoose');
 
-const transactionsSchema = new mTransactions.Schema({
+const transactionsSchema = new mongoose.Schema({
   kind: {
     required: true,
     type: String,
@@ -9,7 +9,12 @@ const transactionsSchema = new mTransactions.Schema({
   value: {
     required: true,
     type: Number,
-  }
+  },
+  date: {
+    required: true,
+    type: Date,
+    default: Date.now,
+  },
 }, { versionKey: false })
 
-module.exports = mTransactions.model('Transactions', transactionsSchema);
+module.exports = mongoose.model('Transactions', transactionsSchema);
