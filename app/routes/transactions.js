@@ -4,6 +4,21 @@ const TransactionsModel = require('../models/transactions');
 
 const router = express.Router();
 
+const verifyBalance = async () => {
+  const result = await TransactionsModel.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalValue: { $sum: "$value" }
+      }
+    }
+  ]);
+
+  const totalValue = result.length > 0 ? result[0].totalValue : 0;
+
+  return totalValue;
+};
+
 router.post('/', async (req, res) => {
   // #swagger.tags = ['Transações']
   // #swagger.summary = 'Criar uma transação'
@@ -11,9 +26,17 @@ router.post('/', async (req, res) => {
   try {
     const { kind, value } = req.body;
 
+    const balance = await verifyBalance();
+
+    if (kind === 'TRANSFER' && balance < value) {
+      return res.status(400).json({ error: 'Saldo insuficiente' });
+    }
+
+    const amount = kind.value === 'TRANSFER' ? (value * -1) : value;
+
     const data = new TransactionsModel({
       kind,
-      value,
+      value: amount,
     });
 
     const newTransaction = await data.save();
@@ -29,9 +52,23 @@ router.get('/', async (req, res) => {
   // #swagger.summary = 'Obter as transações'
 
   try{
-    const list = await TransactionsModel.find();
-    res.json(list);   
+    let { page = 1, limit = 6 } = req.query;
+  
+    let filter = {};
 
+    let query = TransactionsModel.find(filter).sort({ date: -1 });
+
+    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+    query = query.skip(skip).limit(parseInt(limit, 10));
+    
+    const list = await query.exec();
+    const count = await TransactionsModel.countDocuments(filter);
+  
+    res.json({
+      data: list,
+      totalPages: Math.ceil(count / parseInt(limit, 10)),
+      currentPage: parseInt(page, 10)
+    });
   } catch(error){
     res.status(400).json({ error: error });
   }
@@ -48,11 +85,17 @@ router.put('/:id', async (req, res) => {
       new: true,
     };
 
-    const result = await TransactionsModel.findByIdAndUpdate(
+    const balance = await verifyBalance();
+
+    if (updatedData.kind === 'TRANSFER' && balance < updatedData.value) {
+      return res.status(400).json({ error: 'Saldo insuficiente' });
+    }
+
+    const data = await TransactionsModel.findByIdAndUpdate(
       id, updatedData, options
     );
 
-    res.send(result);
+    res.send(data);
   } catch (error) {
     res.status(400).json({ error: error });
   }
@@ -66,7 +109,7 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     await TransactionsModel.findByIdAndDelete(id);
 
-    res.status(200);
+    res.status(200).json({ message: 'Transação deletada com sucesso' });
   } catch (error) {
     res.status(400).json({ error: error });
   }
