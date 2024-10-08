@@ -16,8 +16,15 @@
 - Documentation with [Swagger](https://swagger.io/specification/)
 - IDE: [VSCode](https://code.visualstudio.com/)
 - [MongoDB Compass](https://www.mongodb.com/products/compass)
+- [Insomnia](https://insomnia.rest/)
 
 ### 🎯 Getting Started
+
+Instalar as dependências
+
+```bash
+yarn
+```
 
 Gerar a documentação
 
@@ -31,4 +38,4 @@ Iniciar o projeto
 yarn start
 ```
 
-Abrir [http://localhost:3000/api-docs/](http://localhost:3001/api-docs/) com seu navegador para ver a documentação.
+Abrir [http://localhost:3001/api-docs/](http://localhost:3001/api-docs/) com seu navegador para ver a documentação.
