@@ -16,7 +16,6 @@ router.post("/", async (req, res) => {
       
       const result = await bcryptjs.compare(req.body.password, user.password);
       if (result) {
-
         const token = await jwt.sign({ email: user.email }, process.env.TOKEN_SECRET);
         res.json({ token });
 
@@ -37,23 +36,26 @@ router.post('/cadastrar', async (req, res) => {
   // #swagger.summary = 'Realizar cadastro'
 
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
     const userExists = await UsersModel.findOne({ email });
     if (userExists) {
-      return res.status(422).send('Este nome de usuário não está disponível');
+      return res.status(422).send('Este usuário já existe!');
     }
 
     const salt = await bcryptjs.genSalt(10);  
     const hashPassword = await bcryptjs.hash(password, salt);
 
     const user = new UsersModel({
+      name,
       email,
       password: hashPassword,
     });
 
-    const newUser = await user.save();
-    res.status(201).json(newUser);
+    await user.save();
+
+    const token = await jwt.sign({ email }, process.env.TOKEN_SECRET);
+    res.json({ token });
 
   } catch (error) {
     res.status(400).json({ error: error });
