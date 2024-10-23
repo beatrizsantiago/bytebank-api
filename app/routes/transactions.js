@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Saldo insuficiente' });
     }
 
-    const amount = kind.value === 'TRANSFER' ? (value * -1) : value;
+    const amount = kind === 'TRANSFER' ? (value * -1) : value;
 
     const data = new TransactionsModel({
       kind,
