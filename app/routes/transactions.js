@@ -28,11 +28,11 @@ router.post('/', async (req, res) => {
 
     const balance = await verifyBalance();
 
-    if (kind === 'TRANSFER' && balance < value) {
+    if (kind !== 'DEPOSIT' && balance < value) {
       return res.status(400).json({ error: 'Saldo insuficiente' });
     }
 
-    const amount = kind === 'TRANSFER' ? (value * -1) : value;
+    const amount = kind !== 'DEPOSIT' ? (value * -1) : value;
 
     const data = new TransactionsModel({
       kind,
@@ -87,12 +87,19 @@ router.put('/:id', async (req, res) => {
 
     const balance = await verifyBalance();
 
-    if (updatedData.kind === 'TRANSFER' && balance < updatedData.value) {
+    if (updatedData.kind !== 'DEPOSIT' && balance < updatedData.value) {
       return res.status(400).json({ error: 'Saldo insuficiente' });
     }
 
+    const amount = updatedData.kind !== 'DEPOSIT' ? (value * -1) : value;
+
     const data = await TransactionsModel.findByIdAndUpdate(
-      id, updatedData, options
+      id,
+      {
+        kind: updatedData.kind,
+        value: amount,
+      },
+      options,
     );
 
     res.send(data);

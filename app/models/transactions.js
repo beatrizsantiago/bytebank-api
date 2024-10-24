@@ -4,7 +4,7 @@ const transactionsSchema = new mongoose.Schema({
   kind: {
     required: true,
     type: String,
-    enum: ['DEPOSIT', 'TRANSFER'],
+    enum: ['DEPOSIT', 'CURRENCY_EXCHANGE', 'DOC_TED', 'LEASING'],
   },
   value: {
     required: true,
