@@ -16,8 +16,14 @@ router.post("/", async (req, res) => {
       
       const result = await bcryptjs.compare(req.body.password, user.password);
       if (result) {
-        const token = await jwt.sign({ email: user.email }, process.env.TOKEN_SECRET);
-        res.json({ token });
+
+        const token = await jwt.sign({
+          email: user.email, 
+          user_id: user.id, 
+          user_name: user.name 
+        }, process.env.TOKEN_SECRET);
+
+        res.status(200).json({ token });
 
       } else {
         res.status(400).json({ error: "Usuário e/ou senha inválidos" });
