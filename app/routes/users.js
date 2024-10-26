@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const UsersModel = require('../models/users');
 
@@ -23,8 +24,16 @@ router.put('/:id', async (req, res) => {
       id, updatedData, options
     );
 
-    res.status(200).json({ success: true });
+    const token = await jwt.sign({
+      email: updatedData.email, 
+      user_name: updatedData.name,
+      user_id: id, 
+    }, process.env.TOKEN_SECRET);
+
+    res.status(200).json({ token });
   } catch (error) {
+    console.log(error);
+    
     res.status(400).json({ error: error });
   }
 });

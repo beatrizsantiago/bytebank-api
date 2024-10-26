@@ -60,7 +60,12 @@ router.post('/cadastrar', async (req, res) => {
 
     await user.save();
 
-    const token = await jwt.sign({ email }, process.env.TOKEN_SECRET);
+    const token = await jwt.sign({
+      email: user.email, 
+      user_id: user.id, 
+      user_name: user.name 
+    }, process.env.TOKEN_SECRET);
+
     res.json({ token });
 
   } catch (error) {
