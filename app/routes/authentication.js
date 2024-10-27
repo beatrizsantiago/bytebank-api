@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
       res.status(400).json({ error: "Usuário e/ou senha inválidos" });
     }
   } catch (error) {
-    res.status(400).json({ error });
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -69,7 +69,7 @@ router.post('/cadastrar', async (req, res) => {
     res.json({ token });
 
   } catch (error) {
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.message });
   }
 });
 

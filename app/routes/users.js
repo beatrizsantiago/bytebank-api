@@ -32,9 +32,7 @@ router.put('/:id', async (req, res) => {
 
     res.status(200).json({ token });
   } catch (error) {
-    console.log(error);
-    
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.message });
   }
 });
 

@@ -43,7 +43,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(newTransaction);
 
   } catch (error) {
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -70,7 +70,7 @@ router.get('/', async (req, res) => {
       currentPage: parseInt(page, 10)
     });
   } catch(error){
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -91,7 +91,7 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'Saldo insuficiente' });
     }
 
-    const amount = updatedData.kind !== 'DEPOSIT' ? (value * -1) : value;
+    const amount = updatedData.kind !== 'DEPOSIT' ? (value * -1) : updatedData.value;
 
     const data = await TransactionsModel.findByIdAndUpdate(
       id,
@@ -104,7 +104,7 @@ router.put('/:id', async (req, res) => {
 
     res.send(data);
   } catch (error) {
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -118,7 +118,7 @@ router.delete('/:id', async (req, res) => {
 
     res.status(200).json({ message: 'Transação deletada com sucesso' });
   } catch (error) {
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.message });
   }
 })
 
