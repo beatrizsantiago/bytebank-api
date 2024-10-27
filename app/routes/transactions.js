@@ -91,7 +91,7 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'Saldo insuficiente' });
     }
 
-    const amount = updatedData.kind !== 'DEPOSIT' ? (value * -1) : updatedData.value;
+    const amount = updatedData.kind !== 'DEPOSIT' ? (updatedData.value * -1) : updatedData.value;
 
     const data = await TransactionsModel.findByIdAndUpdate(
       id,
