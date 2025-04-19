@@ -89,18 +89,16 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'Saldo insuficiente' });
     }
 
-    const amount = updatedData.kind !== 'DEPOSIT' ? (updatedData.value * -1) : updatedData.value;
-
     const data = await TransactionsModel.findByIdAndUpdate(
       id,
       {
         kind: updatedData.kind,
-        value: amount,
+        value: updatedData.value,
       },
       options,
     );
 
-    res.send(data);
+    res.json(data);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
