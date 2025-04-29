@@ -2,6 +2,7 @@ const express = require('express');
 const bcryptjs = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 
+const { sha256Server } = require('../utils/sha256Server');
 const UsersModel = require('../models/users');
 
 const router = express.Router()
@@ -11,6 +12,18 @@ router.post("/", async (req, res) => {
   // #swagger.summary = 'Realizar login'
 
   try {
+    const headers = req.headers;
+
+    if (headers['x-content-sha256']) {
+      const sha256 = sha256Server(JSON.stringify(req.body));
+      
+      if (sha256 !== headers['x-content-sha256']) {
+        return res.status(400).json();
+      };
+    } else {
+      return res.status(400).json();
+    }
+
     const user = await UsersModel.findOne({ email: req.body.email });
     if (user) {
       
@@ -42,6 +55,18 @@ router.post('/cadastrar', async (req, res) => {
   // #swagger.summary = 'Realizar cadastro'
 
   try {
+    const headers = req.headers;
+
+    if (headers['x-content-sha256']) {
+      const sha256 = sha256Server(JSON.stringify(req.body));
+      
+      if (sha256 !== headers['x-content-sha256']) {
+        return res.status(400).json();
+      };
+    } else {
+      return res.status(400).json();
+    }
+
     const { name, email, password } = req.body;
 
     const userExists = await UsersModel.findOne({ email });

@@ -1,6 +1,7 @@
 const express = require('express');
 
 const TransactionsModel = require('../models/transactions');
+const { sha256Server } = require('../utils/sha256Server');
 
 const router = express.Router();
 
@@ -24,6 +25,18 @@ router.post('/', async (req, res) => {
   // #swagger.summary = 'Criar uma transação'
 
   try {
+    const headers = req.headers;
+
+    if (headers['x-content-sha256']) {
+      const sha256 = sha256Server(JSON.stringify(req.body));
+      
+      if (sha256 !== headers['x-content-sha256']) {
+        return res.status(400).json();
+      };
+    } else {
+      return res.status(400).json();
+    }
+
     const { kind, value } = req.body;
 
     const balance = await verifyBalance();
